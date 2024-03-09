@@ -3,7 +3,8 @@ import os
 from aiogram import Bot, Dispatcher, executor, types
 import openai
 import sys
-
+from hugchat import hugchat
+from hugchat.login import Login
 
 
 class Reference:
@@ -59,32 +60,24 @@ async def welcome(message: types.Message):
     await message.reply("This bot is powered by OpenAI's GPT-3.5 model. You can ask any question and the bot will try to answer it.\n /start: Start the bot\n /help: Get help\n /clear: Clear the past response")
 
 @dispatcher.message_handler()
-async def chatgpt(message: types.Message):
-    '''
-    This function is used to chat with the GPT-3.5 model
-    '''
-    print(f" >>> User: \t {message.text}")
-    
+async def all_time(message: types.Message):
+    query=message.text
+    print(f" >>> User: \t {query}")
     try:
-        response= openai.ChatCompletion.create(
-            model=model_name,
-            messages=[{"role":"assistant","content":reference.response},{"role": "system", "content": "You are a helpful assistant."}, {"role": "user", "content": message.text}],
-            # prompt=message.text,
-            # temperature=0.7,
-            max_tokens=20
-        )
-        
-        reference.response=response.choices[0].text
-        print(f"\n <<< Bot: \t\n {reference.response}")
-        await bot.send_message(chat_id=message.chat.id, text=reference.response)
-        
-    except Exception as e:
+        await message.answer("Please wait while I process your request...")
+        sign = Login("arka13", "Arkaprabha13")
+        cookies = sign.login()
+        chatbot=hugchat.ChatBot(cookies=cookies.get_dict())
+        id=chatbot.new_conversation()
+        chatbot.change_conversation(id)
+        print("Before chatbot.chat call")
+        bot_response=chatbot.chat(query)
+        print("After chatbot.chat call")
+        print(f"\n <<< Bot: \t\n {bot_response}")
+        await bot.send_message(chat_id=message.chat.id, text=bot_response)
+    except Exception as e:  
         print(e)
         await message.answer("Sorry, I am not able to answer that.")
-    
-   
 
 if __name__ == '__main__':
     executor.start_polling(dispatcher, skip_updates=True)
-    
-    
