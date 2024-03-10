@@ -19,7 +19,8 @@ class Reference:
 load_dotenv()
 TOKEN=os.getenv("TOKEN")
 openai.api_key=os.getenv("OPEN_API_KEY")
-
+name=os.getenv("HUGCHAT_USERNAME")
+password=os.getenv("HUGCHAT_PASSWORD")
 reference= Reference()
 
 model_name="gpt-3.5-turbo"
@@ -70,7 +71,7 @@ async def all_time(message: types.Message):
     try:
         await message.answer("Please wait while I process your request...")
         start_time = time.time()
-        sign = Login("arka13", "Arkaprabha13")
+        sign = Login(name, password)
         cookies = sign.login()
         chatbot=hugchat.ChatBot(cookies=cookies.get_dict())
         id=chatbot.new_conversation()
